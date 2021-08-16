@@ -1,0 +1,201 @@
+​
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- import Vue before Element -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <title>todolist</title>
+</head>
+
+<body>
+
+    <div id="app">
+        <el-container>
+            <el-header height="20">
+                <h1>TodoList</h1>
+            </el-header>
+
+            <el-main>
+                <div>
+                    <el-input placeholder="New Task" class="todoinput" @keyup.enter.native="addTask"
+                        v-model="newtodo.content">
+                    </el-input>
+                    <el-button type="primary" class="addbtn" @click="addTask"><i class="el-icon-plus"></i> Add
+                    </el-button>
+                </div>
+
+                <p>Doing：{{ todolist.length - donenum}} Done：{{ donenum }}</p>
+                <el-row v-for="(item,index) in todolist" class="list-row">
+                    <el-col :xs="2" :sm="1" :md="1" :lg="1" :xl="1" class="check" :class="{ 'red': !todolist[index].done ,
+							'green' : todolist[index].done }">
+                        <el-checkbox size="mini" v-model="item.done"></el-checkbox>
+                    </el-col>
+                    <el-col :xs="20" :sm="22" :md="22" :lg="22" :xl="22">
+                        <input type="text" v-model="item.content" class="ipcont" :class="{done:todolist[index].done}">
+                    </el-col>
+                    <el-col :xs="2" :sm="1" :md="1" :lg="1" :xl="1" class="close">
+                        <!-- <i class="el-icon-close" @click="del(index)"></i> -->
+                        <el-button class="el-icon-close" @click="delTask(index)" type="danger"></el-button>
+                    </el-col>
+                </el-row>
+
+                <div>
+                    <el-button type="warning" @click="clearDone"><i class="el-icon-check"></i> Clear Done
+                    </el-button>
+                    <el-button type="danger" @click="clearAll"><i class="el-icon-delete"></i> Clear All</el-button>
+                </div>
+            </el-main>
+        </el-container>
+    </div>
+
+    <script type="text/javascript">
+        var STORAGE_KEY = 'todolist'
+        function fetch() {
+            return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]')
+        }
+        function save(items) {
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+        }
+        var doit = new Vue({
+            el: '#app',
+            data: {
+                newtodo: {
+                    content: '',
+                    done: false
+                },
+                todolist: [
+                    {
+                        content: 'Make todo list',
+                        done: true
+                    },
+                    {
+                        content: 'Go skydiving',
+                        done: false
+                    }
+                ]
+            },
+            methods: {
+                addTask() {
+                    if (this.newtodo.content) {
+                        this.todolist.push(this.newtodo)
+                        this.newtodo = { content: '', done: false }
+                    }
+                },
+                delTask(index) {
+                    this.todolist.splice(index, 1)
+                },
+                clearDone() {
+                    this.todolist = this.todolist.filter(this.inProgress);
+                },
+                clearAll() {
+                    this.todolist = [];
+                },
+                inProgress(todolist) {
+                    return !this.isDone(todolist);
+                },
+                isDone(todolist) {
+                    return todolist.done;
+                }
+            },
+            computed: {
+                donenum: function () {
+                    return this.todolist.filter(function (val) {
+                        // console.log(val)
+                        return val.done
+                    }).length
+
+                },
+            },
+            watch: {
+                todolist: {
+                    handler(items) {
+                        save(items)
+                    },
+                    deep: true
+                }
+            }
+        })
+
+    </script>
+
+
+
+
+    <style>
+        #app {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            color: #756C83;
+        }
+
+        .el-header {
+            text-align: center;
+        }
+
+        .todoinput {
+            width: 1140px;
+            margin-top: 40px;
+        }
+
+        .addbtn {
+            float: right;
+            margin-top: -40px;
+        }
+
+        .list-row {
+            height: 40px;
+            background-color: #fbfbfb;
+            margin-bottom: 5px;
+        }
+
+        .check {
+            text-align: center;
+            line-height: 40px;
+        }
+
+        .red {
+            border-left: #ef5f65 2px solid;
+        }
+
+        .green {
+            border-left: #B9E1DC 2px solid;
+        }
+
+        .ipcont {
+            width: 90%;
+            margin-top: 8px;
+            border: 0;
+            line-height: 24px;
+            background-color: transparent;
+            font-size: 16px;
+            color: #756C83;
+        }
+
+        .close {
+            text-align: center;
+            line-height: 40px;
+        }
+
+        .el-icon-close {
+            cursor: pointer;
+        }
+
+        .el-icon-close:hover {
+            color: #ef5f65;
+        }
+
+        .done {
+            text-decoration: line-through;
+        }
+    </style>
+</body>
+
+</html>
+
+​
